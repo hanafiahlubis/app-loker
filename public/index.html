@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KerjaKu - Portal Lowongan Kerja Terpercaya</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb', 
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .job-card { transition: all 0.3s ease; cursor: pointer; }
+        .job-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); border-color: #3b82f6; }
+        
+        /* Modal Animation */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-overlay { animation: fadeIn 0.2s ease-out forwards; }
+        .modal-content { animation: slideUp 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-briefcase text-brand-600 text-2xl"></i>
+                <h1 class="text-2xl font-bold text-brand-900 tracking-tight">Kerja<span class="text-brand-600">Ku</span></h1>
+            </div>
+            <!-- Navigation -->
+            <nav class="hidden md:flex gap-6 font-medium text-slate-600">
+                <a href="#" class="text-brand-600 hover:text-brand-700">Cari Lowongan</a>
+            </nav>
+            <!-- Spacer to balance flex layout since login button is removed -->
+            <div class="hidden md:block w-[130px]"></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-8 relative z-10 mb-12">
+        
+        <!-- Search & Filter Box -->
+        <div class="bg-white rounded-xl shadow-lg p-4 md:p-6 mb-8 border border-slate-100">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+                
+                <!-- Keyword Input -->
+                <div class="md:col-span-4">
+                    <label for="search-keyword" class="block text-sm font-medium text-slate-700 mb-1">Pekerjaan / Perusahaan</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+                        </div>
+                        <input type="text" id="search-keyword" class="pl-10 w-full border-slate-300 border rounded-lg py-2.5 px-4 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition" placeholder="Cth: Frontend, Gojek...">
+                    </div>
+                </div>
+
+                <!-- Location Filter -->
+                <div class="md:col-span-3">
+                    <label for="filter-location" class="block text-sm font-medium text-slate-700 mb-1">Lokasi</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-location-dot text-slate-400"></i>
+                        </div>
+                        <select id="filter-location" class="pl-10 w-full border-slate-300 border rounded-lg py-2.5 px-4 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition appearance-none bg-white">
+                            <option value="">Semua Wilayah</option>
+                            <option value="Jakarta Selatan">Jakarta Selatan</option>
+                            <option value="Jakarta Pusat">Jakarta Pusat</option>
+                            <option value="Tangerang">Tangerang</option>
+                            <option value="Bandung">Bandung</option>
+                            <option value="Surabaya">Surabaya</option>
+                            <option value="Yogyakarta">Yogyakarta</option>
+                            <option value="Medan">Medan</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Salary Filter -->
+                <div class="md:col-span-3">
+                    <label for="filter-salary" class="block text-sm font-medium text-slate-700 mb-1">Minimal Gaji</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-money-bill-wave text-slate-400"></i>
+                        </div>
+                        <select id="filter-salary" class="pl-10 w-full border-slate-300 border rounded-lg py-2.5 px-4 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition appearance-none bg-white">
+                            <option value="0">Semua Gaji</option>
+                            <option value="5000000">&ge; Rp 5.000.000</option>
+                            <option value="8000000">&ge; Rp 8.000.000</option>
+                            <option value="12000000">&ge; Rp 12.000.000</option>
+                            <option value="15000000">&ge; Rp 15.000.000</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="md:col-span-2 flex gap-2">
+                    <button id="btn-search" class="w-full bg-brand-600 hover:bg-brand-700 text-white rounded-lg py-2.5 px-4 font-medium transition shadow-sm flex items-center justify-center gap-2">
+                        <span>Cari</span>
+                    </button>
+                    <button id="btn-reset" class="bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg py-2.5 px-4 font-medium transition shadow-sm" title="Reset Filter">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-sm text-slate-500">
+                <span id="result-count">Menampilkan semua lowongan</span>
+                <span class="flex items-center gap-1"><i class="fa-solid fa-bolt text-amber-500"></i> Update Real-time</span>
+            </div>
+        </div>
+
+        <!-- Job List Container -->
+        <div id="job-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Cards will be rendered here by JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden flex-col items-center justify-center py-16 px-4 text-center bg-white rounded-xl shadow-sm border border-slate-100 mt-6">
+            <div class="bg-slate-100 p-6 rounded-full mb-4">
+                <i class="fa-solid fa-magnifying-glass-minus text-4xl text-slate-400"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Pekerjaan tidak ditemukan</h3>
+            <p class="text-slate-500 max-w-md mb-6">Maaf, tidak ada lowongan yang sesuai dengan filter pencarian Anda. Coba gunakan kata kunci atau kriteria lain.</p>
+            <button id="btn-empty-reset" class="text-brand-600 font-medium hover:text-brand-700 hover:underline">Hapus Semua Filter</button>
+        </div>
+    </main>
+
+    <!-- MODAL POP-UP DETAIL LOWONGAN -->
+    <div id="job-modal" class="fixed inset-0 z-50 hidden">
+        <!-- Background Overlay -->
+        <div class="absolute inset-0 bg-slate-900 bg-opacity-60 backdrop-blur-sm modal-overlay" id="modal-overlay"></div>
+        
+        <!-- Modal Content Box -->
+        <div class="absolute inset-y-0 right-0 w-full md:w-2/3 lg:w-1/2 bg-white shadow-2xl modal-content flex flex-col h-full overflow-hidden sm:rounded-l-2xl">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-start sticky top-0 bg-white z-10">
+                <div>
+                    <span id="modal-new-tag" class="inline-block bg-green-100 text-green-700 text-xs font-semibold px-2 py-1 rounded mb-2">Baru untuk kamu</span>
+                    <h2 id="modal-title" class="text-2xl font-bold text-slate-900">Judul Pekerjaan</h2>
+                    <p id="modal-company" class="text-brand-600 font-medium mt-1">Nama Perusahaan <i class="fa-solid fa-circle-check text-blue-500 text-xs ml-1"></i></p>
+                </div>
+                <button id="btn-close-modal" class="text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-full w-8 h-8 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 overflow-y-auto flex-grow bg-slate-50">
+                
+                <!-- Info Grid -->
+                <div class="space-y-3 mb-8 bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                    <div class="flex items-center text-slate-600">
+                        <i class="fa-solid fa-location-dot w-6 text-slate-400"></i>
+                        <span id="modal-location">Lokasi</span>
+                    </div>
+                    <div class="flex items-center text-slate-600">
+                        <i class="fa-solid fa-briefcase w-6 text-slate-400"></i>
+                        <span id="modal-type">Tipe Pekerjaan</span>
+                    </div>
+                    <div class="flex items-center text-slate-600">
+                        <i class="fa-solid fa-money-bill-wave w-6 text-slate-400"></i>
+                        <span id="modal-salary">Gaji</span>
+                    </div>
+                    <div class="flex items-center text-slate-500 text-sm mt-4 pt-3 border-t border-slate-100">
+                        <i class="fa-regular fa-clock w-6"></i>
+                        <span id="modal-posted">Diposting</span>
+                    </div>
+                </div>
+
+                <!-- Description / Qualifications -->
+                <div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+                    <h3 class="font-bold text-lg text-slate-900 mb-3"><i class="fa-solid fa-list-check text-brand-500 mr-2"></i>Kualifikasi & Persyaratan:</h3>
+                    <ul id="modal-qualifications" class="list-disc pl-5 space-y-2 text-slate-600 text-sm md:text-base leading-relaxed">
+                        <!-- Dynamic list -->
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer (Action Buttons) -->
+            <div class="p-4 bg-white border-t border-slate-200 flex gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <!-- Tombol Lamar dengan warna tema selaras -->
+                <a href="#" id="modal-apply-btn" target="_blank" class="flex-grow bg-brand-600 hover:bg-brand-700 text-white text-center py-3 rounded-lg font-bold transition shadow-md flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Lamar Sekarang
+                </a>
+                <!-- Tombol simpan dihapus sesuai permintaan -->
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        // Data Dummy
+        const jobsData = [
+            {
+                id: 1,
+                company: "PT GoTo Gojek Tokopedia Tbk",
+                title: "Frontend Web Developer",
+                salaryText: "Rp 15.000.000 - Rp 25.000.000",
+                salaryMin: 15000000,
+                location: "Jakarta Selatan",
+                logo: "fa-laptop-code",
+                type: "Penuh Waktu (Full-time)",
+                posted: "Diposting 2 hari yang lalu",
+                url: "https://www.gotocompany.com/careers",
+                qualifications: [
+                    "S1 degree in IT/Computer Science or related field",
+                    "Experience min. 2-3 years in Frontend Development",
+                    "Strong knowledge in HTML, CSS, JavaScript, and React.js",
+                    "Familiar with responsive design and Tailwind CSS",
+                    "Code with clean and easy-to-read architecture"
+                ]
+            },
+            {
+                id: 2,
+                company: "Traveloka",
+                title: "Data Analyst",
+                salaryText: "Rp 12.000.000 - Rp 18.000.000",
+                salaryMin: 12000000,
+                location: "Tangerang",
+                logo: "fa-chart-pie",
+                type: "Penuh Waktu (Full-time)",
+                posted: "Diposting 5 jam yang lalu",
+                url: "https://www.traveloka.com/en-id/careers",
+                qualifications: [
+                    "Bachelor's degree in Mathematics, Statistics, or Computer Science",
+                    "Proficiency in SQL, Python, or R",
+                    "Experience with data visualization tools (Tableau, PowerBI)",
+                    "Strong analytical and problem-solving skills"
+                ]
+            },
+            {
+                id: 3,
+                company: "Shopee Indonesia",
+                title: "Backend Engineer",
+                salaryText: "Rp 18.000.000 - Rp 30.000.000",
+                salaryMin: 18000000,
+                location: "Jakarta Pusat",
+                logo: "fa-server",
+                type: "Penuh Waktu (Full-time)",
+                posted: "Diposting 1 hari yang lalu",
+                url: "https://careers.shopee.co.id/",
+                qualifications: [
+                    "Experience min. 3 years as Backend Developer",
+                    "Strong knowledge in Go (Golang) or Java",
+                    "Experience building high-traffic RESTful APIs",
+                    "Familiar with Microservices architecture and Docker/Kubernetes"
+                ]
+            },
+            {
+                id: 4,
+                company: "PT Bank Central Asia Tbk",
+                title: "IT Support Specialist",
+                salaryText: "Rp 7.000.000 - Rp 10.000.000",
+                salaryMin: 7000000,
+                location: "Jakarta Selatan",
+                logo: "fa-headset",
+                type: "Kontrak (Contract)",
+                posted: "Diposting 3 hari yang lalu",
+                url: "https://karir.bca.co.id/",
+                qualifications: [
+                    "D3/S1 dari jurusan Teknik Informatika / Sistem Informasi",
+                    "Menguasai troubleshooting hardware, software, dan jaringan dasar",
+                    "Memiliki kemampuan komunikasi yang baik",
+                    "Bersedia bekerja dengan sistem shifting"
+                ]
+            },
+            {
+                id: 5,
+                company: "PT Astra International Tbk",
+                title: "Area Sales Manager",
+                salaryText: "Rp 15.000.000 - Rp 20.000.000",
+                salaryMin: 15000000,
+                location: "Surabaya",
+                logo: "fa-briefcase",
+                type: "Penuh Waktu (Full-time)",
+                posted: "Diposting 4 hari yang lalu",
+                url: "https://career.astra.co.id/",
+                qualifications: [
+                    "Pendidikan minimal S1 dari semua jurusan",
+                    "Pengalaman minimal 4 tahun di bidang Sales B2B/B2C",
+                    "Memiliki leadership yang kuat dan berorientasi pada target",
+                    "Bersedia dinas ke luar kota di wilayah Jawa Timur"
+                ]
+            },
+            {
+                id: 6,
+                company: "PT Indofood Sukses Makmur Tbk",
+                title: "Digital Marketing Executive",
+                salaryText: "Rp 8.000.000 - Rp 12.000.000",
+                salaryMin: 8000000,
+                location: "Bandung",
+                logo: "fa-bullhorn",
+                type: "Penuh Waktu (Full-time)",
+                posted: "Diposting 1 minggu yang lalu",
+                url: "https://www.indofood.com/career",
+                qualifications: [
+                    "S1 Ilmu Komunikasi, Marketing, atau setara",
+                    "Menguasai Facebook Ads, Google Ads, dan Social Media Management",
+                    "Pengalaman membuat campaign digital yang sukses",
+                    "Kreatif dan update dengan tren media sosial terkini"
+                ]
+            }
+        ];
+
+        // Elemen DOM
+        const jobListContainer = document.getElementById('job-list');
+        const emptyState = document.getElementById('empty-state');
+        const resultCount = document.getElementById('result-count');
+        
+        const inputKeyword = document.getElementById('search-keyword');
+        const selectLocation = document.getElementById('filter-location');
+        const selectSalary = document.getElementById('filter-salary');
+        
+        const btnSearch = document.getElementById('btn-search');
+        const btnReset = document.getElementById('btn-reset');
+        const btnEmptyReset = document.getElementById('btn-empty-reset');
+
+        // Elemen Modal
+        const modal = document.getElementById('job-modal');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const btnCloseModal = document.getElementById('btn-close-modal');
+        
+        // Render Kartu
+        function renderJobs(jobs) {
+            jobListContainer.innerHTML = '';
+            
+            if (jobs.length === 0) {
+                jobListContainer.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                resultCount.textContent = 'Tidak ada lowongan ditemukan';
+            } else {
+                jobListContainer.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                resultCount.textContent = `Menampilkan ${jobs.length} lowongan`;
+                
+                jobs.forEach(job => {
+                    const card = document.createElement('div');
+                    // Menambahkan event onclick untuk membuka modal
+                    card.className = 'job-card bg-white rounded-xl border border-slate-200 p-6 flex flex-col h-full shadow-sm';
+                    card.onclick = () => openModal(job.id);
+                    
+                    card.innerHTML = `
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="w-12 h-12 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center flex-shrink-0">
+                                <i class="fa-solid ${job.logo} text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-800 text-lg leading-tight mb-1 hover:text-brand-600 transition">${job.title}</h3>
+                                <p class="text-brand-600 text-sm font-medium">${job.company}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2 mt-2 mb-6 flex-grow">
+                            <div class="flex items-center text-slate-500 text-sm">
+                                <i class="fa-solid fa-location-dot w-5 text-slate-400"></i>
+                                <span>${job.location}</span>
+                            </div>
+                            <div class="flex items-center text-slate-500 text-sm">
+                                <i class="fa-solid fa-money-bill-wave w-5 text-slate-400"></i>
+                                <span>${job.salaryText}</span>
+                            </div>
+                            <div class="flex items-center text-slate-500 text-sm">
+                                <i class="fa-regular fa-clock w-5 text-slate-400"></i>
+                                <span>${job.type}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="block w-full text-center py-2.5 px-4 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 font-medium group-hover:bg-brand-600 group-hover:text-white transition">
+                            Lihat Detail
+                        </div>
+                    `;
+                    jobListContainer.appendChild(card);
+                });
+            }
+        }
+
+        // Buka Modal & Isi Data
+        function openModal(jobId) {
+            const job = jobsData.find(j => j.id === jobId);
+            if (!job) return;
+
+            // Set data ke dalam modal HTML
+            document.getElementById('modal-title').textContent = job.title;
+            document.getElementById('modal-company').innerHTML = `${job.company} <i class="fa-solid fa-circle-check text-blue-500 text-xs ml-1" title="Perusahaan Terverifikasi"></i>`;
+            document.getElementById('modal-location').textContent = job.location;
+            document.getElementById('modal-type').textContent = job.type;
+            document.getElementById('modal-salary').textContent = job.salaryText;
+            document.getElementById('modal-posted').textContent = job.posted;
+            
+            // Set href tombol Lamar
+            document.getElementById('modal-apply-btn').href = job.url;
+
+            // Render list kualifikasi
+            const ulQual = document.getElementById('modal-qualifications');
+            ulQual.innerHTML = '';
+            job.qualifications.forEach(qual => {
+                const li = document.createElement('li');
+                li.textContent = qual;
+                ulQual.appendChild(li);
+            });
+
+            // Tampilkan Modal
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Mencegah background scroll
+        }
+
+        // Tutup Modal
+        function closeModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto'; // Mengembalikan scroll
+        }
+
+        // Event listener penutup modal
+        btnCloseModal.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', closeModal);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Logika Filter Real-time
+        function filterJobs() {
+            const keyword = inputKeyword.value.toLowerCase().trim();
+            const location = selectLocation.value;
+            const minSalary = parseInt(selectSalary.value);
+
+            const filtered = jobsData.filter(job => {
+                const matchKeyword = job.title.toLowerCase().includes(keyword) || job.company.toLowerCase().includes(keyword);
+                const matchLocation = location === "" || job.location === location;
+                const matchSalary = job.salaryMin >= minSalary;
+
+                return matchKeyword && matchLocation && matchSalary;
+            });
+
+            renderJobs(filtered);
+        }
+
+        // Reset Filter
+        function resetFilters() {
+            inputKeyword.value = '';
+            selectLocation.value = '';
+            selectSalary.value = '0';
+            filterJobs();
+        }
+
+        // Event Listeners (Real-time Filter)
+        inputKeyword.addEventListener('input', filterJobs);
+        selectLocation.addEventListener('change', filterJobs);
+        selectSalary.addEventListener('change', filterJobs);
+
+        // Click Event (Tombol Pencarian)
+        btnSearch.addEventListener('click', filterJobs);
+        btnReset.addEventListener('click', resetFilters);
+        btnEmptyReset.addEventListener('click', resetFilters);
+
+        // Render Pertama Kali
+        renderJobs(jobsData);
+    </script>
+</body>
+</html>
